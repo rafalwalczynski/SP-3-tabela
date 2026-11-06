@@ -1,123 +1,121 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
+const initialPracownicy = [
+  { id: 1, imie: "Anna", nazwisko: "Kowalska", dzial: "IT", pensja: 7200 },
+  { id: 2, imie: "Piotr", nazwisko: "Nowak", dzial: "Sprzedaż", pensja: 5400 },
+  { id: 3, imie: "Maria", nazwisko: "Wiśniewska", dzial: "Księgowość", pensja: 6100 },
+  { id: 4, imie: "Jan", nazwisko: "Kowalczyk", dzial: "IT", pensja: 8300 },
+  { id: 5, imie: "Katarzyna", nazwisko: "Zielińska", dzial: "Sprzedaż", pensja: 5800 },
+  { id: 6, imie: "Tomasz", nazwisko: "Szymański", dzial: "IT", pensja: 9100 },
+  { id: 7, imie: "Agnieszka", nazwisko: "Woźniak", dział: "Księgowość", pensja: "6400"},
+  { id: 8, imie: "Michal", nazwisko: "Kaczmarek", dział: "Sprzedaż", pensja: "5200"},
+  { id: 9, imie: "Magdalena", nazwisko: "Mazur", dział: "IT", pensja: "7800"},
+  { id: 10, imie: "Paweł", nazwisko: "Krawczyk", dział: "Ksiegowość", pensja: "6000"},
+  {id: 11, imie: "Joanna", nazwisko: "Piotrowska", dział: "Sprzedaż", pensja: "5600"},
+  {id: 12, imie: "Łukasz", nazwisko: "Grabowski", dział: "IT", pensja: "8700"}
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [pracownicy] = useState(initialPracownicy);
+  const [szukajNazwisko, setSzukajNazwisko] = useState('');
+  const [wybranyDzial, setWybranyDzial] = useState('');
+
+  const handleNazwiskoChange = (e) => {
+    const wartosc = e.target.value;
+    setSzukajNazwisko(wartosc);
+    obliczIFiltruj(wartosc, wybranyDzial);
+  };
+
+  const handleDzialChange = (e) => {
+    const dzial = e.target.value;
+    setWybranyDzial(dzial);
+    obliczIFiltruj(szukajNazwisko, dzial);
+  };
+
+  const obliczIFiltruj = (fraza, dzial) => {
+    const przefiltrowane = przefiltrujPracownikow(fraza, dzial);
+    console.log(`Wyniki: ${przefiltrowane.length}`);
+  };
+
+  const przefiltrujPracownikow = (fraza, dzial) => {
+    const znormalizowanaFraza = fraza.trim().toLowerCase();
+
+    return pracownicy.filter((pracownik) => {
+      const pasujeNazwisko = pracownik.nazwisko
+        .toLowerCase()
+        .includes(znormalizowanaFraza);
+
+      const pasujeDzial = dzial === '' || pracownik.dzial === dzial;
+
+      return pasujeNazwisko && pasujeDzial;
+    });
+  };
+
+  const wyswietlaniPracownicy = przefiltrujPracownikow(szukajNazwisko, wybranyDzial);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <div className="container mt-4">
+      <h2>Pracownicy</h2>
+
+ 
+      <div className="mb-3">
+        <label htmlFor="szukaj" className="form-label">Szukaj:</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="szukaj" 
+          value={szukajNazwisko}
+          onChange={handleNazwiskoChange}
+        />
+      </div>
+
+  
+      <div className="mb-3">
+        <label htmlFor="dzial" className="form-label">Dział:</label>
+        <select 
+          className="form-select" 
+          id="dzial"
+          value={wybranyDzial}
+          onChange={handleDzialChange}
         >
-          Count is {count}
-        </button>
-      </section>
+          <option value="">Wszystkie</option>
+          <option value="IT">IT</option>
+          <option value="Sprzedaż">Sprzedaż</option>
+          <option value="Księgowość">Księgowość</option>
+        </select>
+      </div>
 
-      <div className="ticks"></div>
+      <p className="fw-bold">Liczba pracowników: {wyswietlaniPracownicy.length}</p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {wyswietlaniPracownicy.length > 0 ? (
+        <table className="table table-striped">
+          <thead className="table-dark">
+            <tr>
+              <th scope="col">Imię</th>
+              <th scope="col">Nazwisko</th>
+              <th scope="col">Dział</th>
+              <th scope="col">Pensja</th>
+            </tr>
+          </thead>
+          <tbody>
+            {wyswietlaniPracownicy.map((p) => (
+              <tr key={p.id}>
+                <td>{p.imie}</td>
+                <td>{p.nazwisko}</td>
+                <td>{p.dzial}</td>
+                <td>{p.pensja}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="alert alert-warning" role="alert">
+          Brak pracowników spełniających kryteria
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
